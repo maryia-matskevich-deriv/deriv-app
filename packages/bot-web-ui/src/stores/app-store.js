@@ -18,7 +18,7 @@ export default class AppStore {
     onMount() {
         const { blockly_store, core, main_content } = this.root_store;
         const { client, common, ui } = core;
-        this.showDigitalOptionsMaltainvestError(client, common);
+        this.showDigitalOptionsMaltainvestError(client, common, ui);
 
         blockly_store.startLoading();
         DBot.initWorkspace(__webpack_public_path__, this.dbot_store, this.api_helpers_store, ui.is_mobile).then(() => {
@@ -236,8 +236,29 @@ export default class AppStore {
         }
     };
 
-    showDigitalOptionsMaltainvestError = (client, common) => {
+    showDigitalOptionsMaltainvestError = (client, common, ui) => {
+        const has_non_eu_account = Object.keys(client.accounts).some(acc => acc?.startsWith('CR')); //can't use: "const is_cr = client?.standpoint?.svg", it works asynchronously
+
         if (
+            (has_non_eu_account && !client.is_logged_in && client.is_eu_country) ||
+            (client.is_eu && window.location.pathname === routes.bot) ||
+            isEuResidenceWithOnlyVRTC(client.active_accounts) ||
+            client.is_options_blocked
+        ) {
+            showDigitalOptionsUnavailableError(
+                common.showError,
+                {
+                    text: localize(
+                        'Unfortunately, this trading platform is not available for EU Deriv account. Please switch to a non-EU account to continue trading.'
+                    ),
+                    title: localize('Deriv Bot is unavailable for this account'),
+                    link: localize('Switch to another account'),
+                },
+                '/bot',
+                ui?.toggleAccountsDialog,
+                false
+            );
+        } else if (
             (!client.is_logged_in && client.is_eu_country) ||
             (client.is_eu && window.location.pathname === routes.bot) ||
             isEuResidenceWithOnlyVRTC(client.active_accounts) ||

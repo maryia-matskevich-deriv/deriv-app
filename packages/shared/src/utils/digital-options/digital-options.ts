@@ -10,7 +10,7 @@ type TShowError = {
     message: string;
     header: string;
     redirect_label: string;
-    redirectOnClick: null;
+    redirectOnClick: () => void | null;
     should_show_refresh: boolean;
     redirect_to: string;
     should_clear_error_on_click: boolean;
@@ -21,16 +21,22 @@ type TAccounts = {
     landing_company_shortcode?: string;
 };
 
-export const showDigitalOptionsUnavailableError = (showError: (t: TShowError) => void, message: TMessage) => {
+export const showDigitalOptionsUnavailableError = (
+    showError: (t: TShowError) => void,
+    message: TMessage,
+    redirect_link: string,
+    redirectOnClick: () => void | null,
+    should_clear_error_on_click: boolean
+) => {
     const { title, text, link } = message;
     showError({
         message: text,
         header: title,
         redirect_label: link,
-        redirectOnClick: null,
+        redirectOnClick,
         should_show_refresh: false,
-        redirect_to: '/mt5',
-        should_clear_error_on_click: true,
+        redirect_to: redirect_link || '/mt5',
+        should_clear_error_on_click: !should_clear_error_on_click ? should_clear_error_on_click : true,
     });
 };
 
