@@ -121,21 +121,19 @@ const PageError = ({
                 </div>
                 <div className='dc-page-error__btn-wrapper'>
                     {should_redirect &&
-                        redirect_urls?.map?.((url, index) => {
-                            return (
-                                <ButtonLink
-                                    className='dc-page-error__btn'
-                                    to={url && !!url === true ? url : ''}
-                                    onClick={onClickHandler}
-                                    size={buttonSize}
-                                    key={index}
-                                >
-                                    <Text weight='bold' className='dc-page-error__btn-text dc-btn__text'>
-                                        {redirect_labels[index]}
-                                    </Text>
-                                </ButtonLink>
-                            );
-                        })}
+                        redirect_urls?.map?.((url, index) => (
+                            <ButtonLink
+                                className='dc-page-error__btn'
+                                to={url && !!url === true ? url : ''}
+                                onClick={onClickHandler}
+                                size={buttonSize}
+                                key={index}
+                            >
+                                <Text weight='bold' className='dc-page-error__btn-text dc-btn__text'>
+                                    {redirect_labels[index]}
+                                </Text>
+                            </ButtonLink>
+                        ))}
                     {!should_redirect && (
                         <Button type='button' className='dc-page-error__btn' onClick={onClickHandler} large primary>
                             <Text weight='bold' className='dc-page-error__btn-text dc-btn__text'>
