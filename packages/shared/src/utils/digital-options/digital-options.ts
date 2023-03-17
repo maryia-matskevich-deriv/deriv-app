@@ -14,6 +14,7 @@ type TShowError = {
     should_show_refresh: boolean;
     redirect_to: string;
     should_clear_error_on_click: boolean;
+    should_redirect: boolean;
 };
 
 type TAccounts = {
@@ -24,9 +25,9 @@ type TAccounts = {
 export const showDigitalOptionsUnavailableError = (
     showError: (t: TShowError) => void,
     message: TMessage,
-    redirect_link: string,
     redirectOnClick: () => void | null,
-    should_clear_error_on_click: boolean
+    should_clear_error_on_click: boolean,
+    should_redirect: boolean
 ) => {
     const { title, text, link } = message;
     showError({
@@ -35,8 +36,9 @@ export const showDigitalOptionsUnavailableError = (
         redirect_label: link,
         redirectOnClick,
         should_show_refresh: false,
-        redirect_to: redirect_link || '/mt5',
+        redirect_to: '/mt5',
         should_clear_error_on_click: !should_clear_error_on_click ? should_clear_error_on_click : true,
+        should_redirect,
     });
 };
 

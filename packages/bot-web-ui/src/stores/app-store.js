@@ -237,7 +237,7 @@ export default class AppStore {
     };
 
     showDigitalOptionsMaltainvestError = (client, common, ui) => {
-        const has_non_eu_account = Object.keys(client.accounts).some(acc => acc?.startsWith('CR')); //can't use: "const is_cr = client?.standpoint?.svg", it works asynchronously
+        const has_non_eu_account = Object.keys(client.accounts).some(acc => acc?.startsWith('CR'));
 
         if (
             (has_non_eu_account && !client.is_logged_in && client.is_eu_country) ||
@@ -254,8 +254,8 @@ export default class AppStore {
                     title: localize('Deriv Bot is unavailable for this account'),
                     link: localize('Switch to another account'),
                 },
-                '/bot',
                 ui?.toggleAccountsDialog,
+                false,
                 false
             );
         } else if (
