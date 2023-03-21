@@ -19,10 +19,19 @@ describe('<ErrorComponent/>', () => {
             value: { reload: jest.fn() },
         });
     });
+
     const props = {
+        header: 'test header message',
+        message: 'test message',
         redirect_to: '/testurl',
-        redirect_label: ['testlabel'],
+        redirect_label: 'testlabel',
+        should_clear_error_on_click: true,
+        should_show_refresh: true,
+        app_routing_history: ['/test'],
+        redirectOnClick: jest.fn(),
+        setError: jest.fn(),
     };
+
     it('should show the default message when message is not passed', () => {
         const message = '';
         renderWithRouter(<ErrorComponent {...props} message={message} />);
@@ -54,24 +63,36 @@ describe('<ErrorComponent/>', () => {
     });
     it('should refresh the page when redirectOnClick is not passed or empty', () => {
         const redirectOnClick = '';
-        renderWithRouter(<ErrorComponent {...props} buttonOnClick={redirectOnClick} />);
+        renderWithRouter(<ErrorComponent {...props} redirectOnClick={redirectOnClick} />);
         reloadFn(); // as defined above..
         expect(window.location.reload).toHaveBeenCalled();
     });
     it('should show the redirect button label as refresh when there is no redirect_label', () => {
         const redirectOnClick = '';
         const redirect_to = '/testurl';
-        renderWithRouter(<ErrorComponent redirect_to={redirect_to} buttonOnClick={redirectOnClick} />);
+        renderWithRouter(
+            <ErrorComponent
+                {...props}
+                redirect_label={''}
+                redirect_to={redirect_to}
+                redirectOnClick={redirectOnClick}
+            />
+        );
         expect(screen.getByText('Refresh')).toBeInTheDocument();
     });
     it('should trigger the history.listen and call the setError function when redirect button get clicked', () => {
         const redirectOnClick = jest.fn();
         const setError = jest.fn();
-        renderWithRouter(<ErrorComponent {...props} buttonOnClick={redirectOnClick} setError={setError} />);
+        renderWithRouter(
+            <ErrorComponent
+                {...props}
+                should_show_refresh={false}
+                redirectOnClick={redirectOnClick}
+                setError={setError}
+            />
+        );
 
         fireEvent.click(screen.getByText('testlabel'));
-        if (typeof setError === 'function') {
-            expect(setError).toHaveBeenCalledTimes(1);
-        }
+        expect(setError).toHaveBeenCalledTimes(1);
     });
 });

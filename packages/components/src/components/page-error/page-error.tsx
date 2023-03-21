@@ -135,7 +135,13 @@ const PageError = ({
                             </ButtonLink>
                         ))}
                     {!should_redirect && (
-                        <Button type='button' className='dc-page-error__btn' onClick={onClickHandler} large primary>
+                        <Button
+                            type='button'
+                            className='dc-page-error__btn--no-redirect'
+                            onClick={onClickHandler}
+                            large
+                            primary
+                        >
                             <Text weight='bold' className='dc-page-error__btn-text dc-btn__text'>
                                 {redirect_labels[0]}
                             </Text>
