@@ -21,9 +21,6 @@ describe('<PageError/>', () => {
         buttonOnClick: jest.fn(),
         setError: jest.fn(),
         should_redirect: true,
-        // classNameImage: 'test_class_name',
-        // has_malta_account: true,
-        // image_url: 'image_url',
     };
 
     it('should call buttonOnClick() by button click when should_redirect, should_clear_error_on_click equal false', () => {
