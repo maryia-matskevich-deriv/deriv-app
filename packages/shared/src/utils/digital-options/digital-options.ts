@@ -26,7 +26,7 @@ export const showDigitalOptionsUnavailableError = (
     showError: (t: TShowError) => void,
     message: TMessage,
     redirectOnClick: () => void | null,
-    should_clear_error_on_click: boolean,
+    should_clear_error_on_click = true,
     should_redirect: boolean
 ) => {
     const { title, text, link } = message;
@@ -37,7 +37,7 @@ export const showDigitalOptionsUnavailableError = (
         redirectOnClick,
         should_show_refresh: false,
         redirect_to: '/mt5',
-        should_clear_error_on_click: !should_clear_error_on_click ? should_clear_error_on_click : true,
+        should_clear_error_on_click,
         should_redirect,
     });
 };

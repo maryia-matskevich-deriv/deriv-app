@@ -15,7 +15,7 @@ describe('<PageError/>', () => {
     const props = {
         header: 'test header message',
         messages: ['test message'],
-        redirect_labels: ['testlabel'],
+        redirect_labels: ['test_label'],
         redirect_urls: ['/test'],
         should_clear_error_on_click: true,
         buttonOnClick: jest.fn(),
@@ -23,7 +23,7 @@ describe('<PageError/>', () => {
         should_redirect: true,
     };
 
-    it('should call buttonOnClick() by button click when should_redirect, should_clear_error_on_click equal false', () => {
+    it('should call buttonOnClick() upon button click when should_redirect and should_clear_error_on_click equal to false', () => {
         const buttonOnClick = jest.fn();
         render(
             <PageError

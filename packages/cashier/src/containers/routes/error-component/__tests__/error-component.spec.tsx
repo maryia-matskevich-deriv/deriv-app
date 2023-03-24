@@ -24,7 +24,7 @@ describe('<ErrorComponent/>', () => {
         header: 'test header message',
         message: 'test message',
         redirect_to: '/testurl',
-        redirect_label: 'testlabel',
+        redirect_label: 'test_label',
         should_clear_error_on_click: true,
         should_show_refresh: true,
         app_routing_history: ['/test'],
@@ -92,7 +92,7 @@ describe('<ErrorComponent/>', () => {
             />
         );
 
-        fireEvent.click(screen.getByText('testlabel'));
+        fireEvent.click(screen.getByText('test_label'));
         expect(setError).toHaveBeenCalledTimes(1);
     });
 });
