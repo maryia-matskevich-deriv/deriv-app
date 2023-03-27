@@ -26,8 +26,8 @@ export const showDigitalOptionsUnavailableError = (
     showError: (t: TShowError) => void,
     message: TMessage,
     redirectOnClick: () => void | null,
-    should_clear_error_on_click = true,
-    should_redirect: boolean
+    should_redirect: boolean,
+    should_clear_error_on_click = true
 ) => {
     const { title, text, link } = message;
     showError({
