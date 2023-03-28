@@ -36,7 +36,7 @@ const PageError = ({
     redirect_urls,
     should_clear_error_on_click,
     setError,
-    should_redirect,
+    should_redirect = true,
 }: TPageErrorProps) => {
     const onClickHandler = () => {
         if (should_clear_error_on_click) {
