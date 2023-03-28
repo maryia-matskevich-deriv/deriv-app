@@ -141,7 +141,7 @@ export default class AppStore {
     }
 
     registerLandingCompanyChangeReaction() {
-        const { client, common } = this.root_store.core;
+        const { client, common, ui } = this.root_store.core;
 
         this.disposeLandingCompanyChangeReaction = reaction(
             () => client.landing_company_shortcode,
@@ -152,20 +152,26 @@ export default class AppStore {
                     isEuResidenceWithOnlyVRTC(client.active_accounts) ||
                     client.is_options_blocked
                 ) {
-                    showDigitalOptionsUnavailableError(common.showError, {
-                        text: localize(
-                            'We’re working to have this available for you soon. If you have another account, switch to that account to continue trading. You may add a Deriv MT5 Financial.'
-                        ),
-                        title: localize('DBot is not available for this account'),
-                        link: localize('Go to Deriv MT5 dashboard'),
-                    });
+                    showDigitalOptionsUnavailableError(
+                        common.showError,
+                        {
+                            text: localize(
+                                'Unfortunately, this trading platform is not available for EU Deriv account. Please switch to a non-EU account to continue trading.'
+                            ),
+                            title: localize('Deriv Bot is unavailable for this account'),
+                            link: localize('Switch to another account'),
+                        },
+                        ui?.toggleAccountsDialog,
+                        false,
+                        false
+                    );
                 }
             }
         );
     }
 
     registerResidenceChangeReaction() {
-        const { client, common } = this.root_store.core;
+        const { client, common, ui } = this.root_store.core;
 
         this.disposeResidenceChangeReaction = reaction(
             () => client.account_settings.country_code,
@@ -176,13 +182,19 @@ export default class AppStore {
                     isEuResidenceWithOnlyVRTC(client.active_accounts) ||
                     client.is_options_blocked
                 ) {
-                    showDigitalOptionsUnavailableError(common.showError, {
-                        text: localize(
-                            'We’re working to have this available for you soon. If you have another account, switch to that account to continue trading. You may add a Deriv MT5 Financial.'
-                        ),
-                        title: localize('DBot is not available for this account'),
-                        link: localize('Go to Deriv MT5 dashboard'),
-                    });
+                    showDigitalOptionsUnavailableError(
+                        common.showError,
+                        {
+                            text: localize(
+                                'Unfortunately, this trading platform is not available for EU Deriv account. Please switch to a non-EU account to continue trading.'
+                            ),
+                            title: localize('Deriv Bot is unavailable for this account'),
+                            link: localize('Switch to another account'),
+                        },
+                        ui?.toggleAccountsDialog,
+                        false,
+                        false
+                    );
                 }
             }
         );

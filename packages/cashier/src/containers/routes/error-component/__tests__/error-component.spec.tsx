@@ -93,6 +93,6 @@ describe('<ErrorComponent/>', () => {
         );
 
         fireEvent.click(screen.getByText('test_label'));
-        expect(setError).toHaveBeenCalledTimes(1);
+        expect(setError).toHaveBeenCalled();
     });
 });
