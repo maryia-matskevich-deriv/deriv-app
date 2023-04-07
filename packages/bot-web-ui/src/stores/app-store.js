@@ -147,8 +147,7 @@ export default class AppStore {
             () => client.landing_company_shortcode,
             () => {
                 if (
-                    (!client.is_logged_in && client.is_eu_country) ||
-                    (client.is_eu && window.location.pathname === routes.bot) ||
+                    (client.is_eu && window.location.pathname === routes.bot && client.is_low_risk) ||
                     isEuResidenceWithOnlyVRTC(client.active_accounts) ||
                     client.is_options_blocked
                 ) {
@@ -165,6 +164,17 @@ export default class AppStore {
                         false,
                         false
                     );
+                } else if (
+                    (client.is_eu_country && window.location.pathname === routes.bot) ||
+                    (!client.is_bot_allowed && window.location.pathname === routes.bot)
+                ) {
+                    showDigitalOptionsUnavailableError(common.showError, {
+                        title: client.is_logged_in
+                            ? localize('Deriv Bot is not available for EU clients')
+                            : localize('Deriv Bot is unavailable in the EU'),
+                        link: client.is_logged_in ? localize("Back to Trader's Hub") : localize('Login'),
+                        route: routes.traders_hub,
+                    });
                 }
             }
         );
@@ -177,8 +187,7 @@ export default class AppStore {
             () => client.account_settings.country_code,
             () => {
                 if (
-                    (!client.is_logged_in && client.is_eu_country) ||
-                    (client.is_eu && window.location.pathname === routes.bot) ||
+                    (client.is_eu && window.location.pathname === routes.bot && client.is_low_risk) ||
                     isEuResidenceWithOnlyVRTC(client.active_accounts) ||
                     client.is_options_blocked
                 ) {
@@ -195,6 +204,17 @@ export default class AppStore {
                         false,
                         false
                     );
+                } else if (
+                    (client.is_eu_country && window.location.pathname === routes.bot) ||
+                    (!client.is_bot_allowed && window.location.pathname === routes.bot)
+                ) {
+                    showDigitalOptionsUnavailableError(common.showError, {
+                        title: client.is_logged_in
+                            ? localize('Deriv Bot is not available for EU clients')
+                            : localize('Deriv Bot is unavailable in the EU'),
+                        link: client.is_logged_in ? localize("Back to Trader's Hub") : localize('Login'),
+                        route: routes.traders_hub,
+                    });
                 }
             }
         );
@@ -250,8 +270,7 @@ export default class AppStore {
 
     showDigitalOptionsMaltainvestError = (client, common, ui) => {
         if (
-            (!client.is_logged_in && client.is_eu_country) ||
-            (client.is_eu && window.location.pathname === routes.bot) ||
+            (client.is_eu && window.location.pathname === routes.bot && client.is_low_risk) ||
             isEuResidenceWithOnlyVRTC(client.active_accounts) ||
             client.is_options_blocked
         ) {
@@ -268,6 +287,18 @@ export default class AppStore {
                 false,
                 false
             );
+        } else if (
+            (client.is_eu_country && window.location.pathname === routes.bot) ||
+            (!client.is_bot_allowed && window.location.pathname === routes.bot)
+        ) {
+            showDigitalOptionsUnavailableError(common.showError, {
+                text: localize(' '),
+                title: client.is_logged_in
+                    ? localize('Deriv Bot is not available for EU clients')
+                    : localize('Deriv Bot is unavailable in the EU'),
+                link: client.is_logged_in ? localize("Back to Trader's Hub") : localize('Login'),
+                route: routes.traders_hub,
+            });
         } else if (common.has_error) {
             common.setError(false, null);
         }
