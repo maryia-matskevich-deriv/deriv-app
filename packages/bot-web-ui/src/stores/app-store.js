@@ -169,6 +169,7 @@ export default class AppStore {
                     (!client.is_bot_allowed && window.location.pathname === routes.bot)
                 ) {
                     showDigitalOptionsUnavailableError(common.showError, {
+                        text: localize(' '),
                         title: client.is_logged_in
                             ? localize('Deriv Bot is not available for EU clients')
                             : localize('Deriv Bot is unavailable in the EU'),
@@ -209,6 +210,7 @@ export default class AppStore {
                     (!client.is_bot_allowed && window.location.pathname === routes.bot)
                 ) {
                     showDigitalOptionsUnavailableError(common.showError, {
+                        text: localize(' '),
                         title: client.is_logged_in
                             ? localize('Deriv Bot is not available for EU clients')
                             : localize('Deriv Bot is unavailable in the EU'),
