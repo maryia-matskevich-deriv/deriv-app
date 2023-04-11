@@ -1,4 +1,4 @@
-import { action, reaction, makeObservable } from 'mobx';
+import { action, reaction, makeObservable, when } from 'mobx';
 import { isEuResidenceWithOnlyVRTC, showDigitalOptionsUnavailableError, routes } from '@deriv/shared';
 import { localize } from '@deriv/translations';
 import { runIrreversibleEvents, ApiHelpers, DBot } from '@deriv/bot-skeleton';
@@ -35,6 +35,13 @@ export default class AppStore {
         window.addEventListener('beforeunload', this.onBeforeUnload);
 
         main_content.getCachedActiveTab();
+
+        when(
+            () => client?.is_eu_country,
+            () => {
+                this.showDigitalOptionsMaltainvestError(client, common, ui);
+            }
+        );
     }
 
     onUnmount() {
@@ -151,23 +158,23 @@ export default class AppStore {
                     isEuResidenceWithOnlyVRTC(client.active_accounts) ||
                     client.is_options_blocked
                 ) {
-                    showDigitalOptionsUnavailableError(
-                        common.showError,
-                        {
-                            text: localize(
-                                'Unfortunately, this trading platform is not available for EU Deriv account. Please switch to a non-EU account to continue trading.'
-                            ),
-                            title: localize('Deriv Bot is unavailable for this account'),
-                            link: localize('Switch to another account'),
-                        },
-                        ui?.toggleAccountsDialog,
-                        false,
-                        false
-                    );
-                } else if (
-                    (client.is_eu_country && window.location.pathname === routes.bot) ||
-                    (!client.is_bot_allowed && window.location.pathname === routes.bot)
-                ) {
+                    const toggleAccountsDialog = ui?.toggleAccountsDialog;
+                    if (toggleAccountsDialog) {
+                        showDigitalOptionsUnavailableError(
+                            common.showError,
+                            {
+                                text: localize(
+                                    'Unfortunately, this trading platform is not available for EU Deriv account. Please switch to a non-EU account to continue trading.'
+                                ),
+                                title: localize('Deriv Bot is unavailable for this account'),
+                                link: localize('Switch to another account'),
+                            },
+                            toggleAccountsDialog,
+                            false,
+                            false
+                        );
+                    }
+                } else if (client.is_eu_country && window.location.pathname === routes.bot) {
                     showDigitalOptionsUnavailableError(common.showError, {
                         text: localize(' '),
                         title: client.is_logged_in
@@ -192,23 +199,23 @@ export default class AppStore {
                     isEuResidenceWithOnlyVRTC(client.active_accounts) ||
                     client.is_options_blocked
                 ) {
-                    showDigitalOptionsUnavailableError(
-                        common.showError,
-                        {
-                            text: localize(
-                                'Unfortunately, this trading platform is not available for EU Deriv account. Please switch to a non-EU account to continue trading.'
-                            ),
-                            title: localize('Deriv Bot is unavailable for this account'),
-                            link: localize('Switch to another account'),
-                        },
-                        ui?.toggleAccountsDialog,
-                        false,
-                        false
-                    );
-                } else if (
-                    (client.is_eu_country && window.location.pathname === routes.bot) ||
-                    (!client.is_bot_allowed && window.location.pathname === routes.bot)
-                ) {
+                    const toggleAccountsDialog = ui?.toggleAccountsDialog;
+                    if (toggleAccountsDialog) {
+                        showDigitalOptionsUnavailableError(
+                            common.showError,
+                            {
+                                text: localize(
+                                    'Unfortunately, this trading platform is not available for EU Deriv account. Please switch to a non-EU account to continue trading.'
+                                ),
+                                title: localize('Deriv Bot is unavailable for this account'),
+                                link: localize('Switch to another account'),
+                            },
+                            toggleAccountsDialog,
+                            false,
+                            false
+                        );
+                    }
+                } else if (client.is_eu_country && window.location.pathname === routes.bot) {
                     showDigitalOptionsUnavailableError(common.showError, {
                         text: localize(' '),
                         title: client.is_logged_in
@@ -276,23 +283,23 @@ export default class AppStore {
             isEuResidenceWithOnlyVRTC(client.active_accounts) ||
             client.is_options_blocked
         ) {
-            showDigitalOptionsUnavailableError(
-                common.showError,
-                {
-                    text: localize(
-                        'Unfortunately, this trading platform is not available for EU Deriv account. Please switch to a non-EU account to continue trading.'
-                    ),
-                    title: localize('Deriv Bot is unavailable for this account'),
-                    link: localize('Switch to another account'),
-                },
-                ui?.toggleAccountsDialog,
-                false,
-                false
-            );
-        } else if (
-            (client.is_eu_country && window.location.pathname === routes.bot) ||
-            (!client.is_bot_allowed && window.location.pathname === routes.bot)
-        ) {
+            const toggleAccountsDialog = ui?.toggleAccountsDialog;
+            if (toggleAccountsDialog) {
+                showDigitalOptionsUnavailableError(
+                    common.showError,
+                    {
+                        text: localize(
+                            'Unfortunately, this trading platform is not available for EU Deriv account. Please switch to a non-EU account to continue trading.'
+                        ),
+                        title: localize('Deriv Bot is unavailable for this account'),
+                        link: localize('Switch to another account'),
+                    },
+                    toggleAccountsDialog,
+                    false,
+                    false
+                );
+            }
+        } else if (client.is_eu_country && window.location.pathname === routes.bot) {
             showDigitalOptionsUnavailableError(common.showError, {
                 text: localize(' '),
                 title: client.is_logged_in
