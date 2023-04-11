@@ -15,6 +15,25 @@ export default class AppStore {
         this.api_helpers_store = null;
     }
 
+    eu_non_eu_error_message = {
+        text: localize(
+            'Unfortunately, this trading platform is not available for EU Deriv account. Please switch to a non-EU account to continue trading.'
+        ),
+        title: localize('Deriv Bot is unavailable for this account'),
+        link: localize('Switch to another account'),
+    };
+
+    getLoggedInErrorMessage = is_logged_in => {
+        return {
+            text: localize(' '),
+            title: is_logged_in
+                ? localize('Deriv Bot is not available for EU clients')
+                : localize('Deriv Bot is unavailable in the EU'),
+            link: is_logged_in ? localize("Back to Trader's Hub") : localize('Login'),
+            route: routes.traders_hub,
+        };
+    };
+
     onMount() {
         const { blockly_store, core, main_content } = this.root_store;
         const { client, common, ui } = core;
@@ -162,27 +181,17 @@ export default class AppStore {
                     if (toggleAccountsDialog) {
                         showDigitalOptionsUnavailableError(
                             common.showError,
-                            {
-                                text: localize(
-                                    'Unfortunately, this trading platform is not available for EU Deriv account. Please switch to a non-EU account to continue trading.'
-                                ),
-                                title: localize('Deriv Bot is unavailable for this account'),
-                                link: localize('Switch to another account'),
-                            },
+                            this.eu_non_eu_error_message,
                             toggleAccountsDialog,
                             false,
                             false
                         );
                     }
                 } else if (client.is_eu_country && window.location.pathname === routes.bot) {
-                    showDigitalOptionsUnavailableError(common.showError, {
-                        text: localize(' '),
-                        title: client.is_logged_in
-                            ? localize('Deriv Bot is not available for EU clients')
-                            : localize('Deriv Bot is unavailable in the EU'),
-                        link: client.is_logged_in ? localize("Back to Trader's Hub") : localize('Login'),
-                        route: routes.traders_hub,
-                    });
+                    showDigitalOptionsUnavailableError(
+                        common.showError,
+                        this.getLoggedInErrorMessage(client.is_logged_in)
+                    );
                 }
             }
         );
@@ -203,27 +212,17 @@ export default class AppStore {
                     if (toggleAccountsDialog) {
                         showDigitalOptionsUnavailableError(
                             common.showError,
-                            {
-                                text: localize(
-                                    'Unfortunately, this trading platform is not available for EU Deriv account. Please switch to a non-EU account to continue trading.'
-                                ),
-                                title: localize('Deriv Bot is unavailable for this account'),
-                                link: localize('Switch to another account'),
-                            },
+                            this.eu_non_eu_error_message,
                             toggleAccountsDialog,
                             false,
                             false
                         );
                     }
                 } else if (client.is_eu_country && window.location.pathname === routes.bot) {
-                    showDigitalOptionsUnavailableError(common.showError, {
-                        text: localize(' '),
-                        title: client.is_logged_in
-                            ? localize('Deriv Bot is not available for EU clients')
-                            : localize('Deriv Bot is unavailable in the EU'),
-                        link: client.is_logged_in ? localize("Back to Trader's Hub") : localize('Login'),
-                        route: routes.traders_hub,
-                    });
+                    showDigitalOptionsUnavailableError(
+                        common.showError,
+                        this.getLoggedInErrorMessage(client.is_logged_in)
+                    );
                 }
             }
         );
@@ -287,27 +286,14 @@ export default class AppStore {
             if (toggleAccountsDialog) {
                 showDigitalOptionsUnavailableError(
                     common.showError,
-                    {
-                        text: localize(
-                            'Unfortunately, this trading platform is not available for EU Deriv account. Please switch to a non-EU account to continue trading.'
-                        ),
-                        title: localize('Deriv Bot is unavailable for this account'),
-                        link: localize('Switch to another account'),
-                    },
+                    this.eu_non_eu_error_message,
                     toggleAccountsDialog,
                     false,
                     false
                 );
             }
         } else if (client.is_eu_country && window.location.pathname === routes.bot) {
-            showDigitalOptionsUnavailableError(common.showError, {
-                text: localize(' '),
-                title: client.is_logged_in
-                    ? localize('Deriv Bot is not available for EU clients')
-                    : localize('Deriv Bot is unavailable in the EU'),
-                link: client.is_logged_in ? localize("Back to Trader's Hub") : localize('Login'),
-                route: routes.traders_hub,
-            });
+            showDigitalOptionsUnavailableError(common.showError, this.getLoggedInErrorMessage(client.is_logged_in));
         } else if (common.has_error) {
             common.setError(false, null);
         }
