@@ -5,15 +5,6 @@ import userEvent from '@testing-library/user-event';
 import { createBrowserHistory } from 'history';
 import PageError from '../index';
 
-jest.mock('../../button-link', () => {
-    const original_module = jest.requireActual('../../button-link');
-
-    return {
-        ...original_module,
-        ButtonLink: jest.fn(() => 'ButtonLink'),
-    };
-});
-
 describe('<PageError/>', () => {
     let history;
     const renderWithRouter = component => {
