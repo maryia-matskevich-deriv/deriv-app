@@ -15,7 +15,7 @@ export default class AppStore {
         this.api_helpers_store = null;
     }
 
-    eu_non_eu_error_message = {
+    error_for_non_eu_client = {
         text: localize(
             'Unfortunately, this trading platform is not available for EU Deriv account. Please switch to a non-EU account to continue trading.'
         ),
@@ -23,7 +23,7 @@ export default class AppStore {
         link: localize('Switch to another account'),
     };
 
-    getLoggedInErrorMessage = is_logged_in => {
+    getErrorForEuClients = is_logged_in => {
         return {
             text: localize(' '),
             title: is_logged_in
@@ -173,7 +173,10 @@ export default class AppStore {
             () => client.landing_company_shortcode,
             () => {
                 if (
-                    (client.is_eu && window.location.pathname === routes.bot && client.is_low_risk) ||
+                    (client.is_eu &&
+                        window.location.pathname === routes.bot &&
+                        client.is_low_risk &&
+                        !client.is_eu_country) ||
                     isEuResidenceWithOnlyVRTC(client.active_accounts) ||
                     client.is_options_blocked
                 ) {
@@ -181,16 +184,19 @@ export default class AppStore {
                     if (toggleAccountsDialog) {
                         showDigitalOptionsUnavailableError(
                             common.showError,
-                            this.eu_non_eu_error_message,
+                            this.error_for_non_eu_client,
                             toggleAccountsDialog,
                             false,
                             false
                         );
                     }
-                } else if (client.is_eu_country && window.location.pathname === routes.bot) {
+                } else if (
+                    (client.is_eu_country && window.location.pathname === routes.bot) ||
+                    (!client.is_bot_allowed && window.location.pathname === routes.bot)
+                ) {
                     showDigitalOptionsUnavailableError(
                         common.showError,
-                        this.getLoggedInErrorMessage(client.is_logged_in)
+                        this.getErrorForEuClients(client.is_logged_in)
                     );
                 }
             }
@@ -204,7 +210,10 @@ export default class AppStore {
             () => client.account_settings.country_code,
             () => {
                 if (
-                    (client.is_eu && window.location.pathname === routes.bot && client.is_low_risk) ||
+                    (client.is_eu &&
+                        window.location.pathname === routes.bot &&
+                        client.is_low_risk &&
+                        !client.is_eu_country) ||
                     isEuResidenceWithOnlyVRTC(client.active_accounts) ||
                     client.is_options_blocked
                 ) {
@@ -212,16 +221,19 @@ export default class AppStore {
                     if (toggleAccountsDialog) {
                         showDigitalOptionsUnavailableError(
                             common.showError,
-                            this.eu_non_eu_error_message,
+                            this.error_for_non_eu_client,
                             toggleAccountsDialog,
                             false,
                             false
                         );
                     }
-                } else if (client.is_eu_country && window.location.pathname === routes.bot) {
+                } else if (
+                    (client.is_eu_country && window.location.pathname === routes.bot) ||
+                    (!client.is_bot_allowed && window.location.pathname === routes.bot)
+                ) {
                     showDigitalOptionsUnavailableError(
                         common.showError,
-                        this.getLoggedInErrorMessage(client.is_logged_in)
+                        this.getErrorForEuClients(client.is_logged_in)
                     );
                 }
             }
@@ -278,7 +290,7 @@ export default class AppStore {
 
     showDigitalOptionsMaltainvestError = (client, common, ui) => {
         if (
-            (client.is_eu && window.location.pathname === routes.bot && client.is_low_risk) ||
+            (client.is_eu && window.location.pathname === routes.bot && client.is_low_risk && !client.is_eu_country) ||
             isEuResidenceWithOnlyVRTC(client.active_accounts) ||
             client.is_options_blocked
         ) {
@@ -286,14 +298,17 @@ export default class AppStore {
             if (toggleAccountsDialog) {
                 showDigitalOptionsUnavailableError(
                     common.showError,
-                    this.eu_non_eu_error_message,
+                    this.error_for_non_eu_client,
                     toggleAccountsDialog,
                     false,
                     false
                 );
             }
-        } else if (client.is_eu_country && window.location.pathname === routes.bot) {
-            showDigitalOptionsUnavailableError(common.showError, this.getLoggedInErrorMessage(client.is_logged_in));
+        } else if (
+            (client.is_eu_country && window.location.pathname === routes.bot) ||
+            (!client.is_bot_allowed && window.location.pathname === routes.bot)
+        ) {
+            showDigitalOptionsUnavailableError(common.showError, this.getErrorForEuClients(client.is_logged_in));
         } else if (common.has_error) {
             common.setError(false, null);
         }
