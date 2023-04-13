@@ -15,17 +15,19 @@ export default class AppStore {
         this.api_helpers_store = null;
     }
 
-    error_for_non_eu_client = {
-        text: localize(
-            'Unfortunately, this trading platform is not available for EU Deriv account. Please switch to a non-EU account to continue trading.'
-        ),
-        title: localize('Deriv Bot is unavailable for this account'),
-        link: localize('Switch to another account'),
+    getErrorForNonEuClients = () => {
+        return {
+            text: localize(
+                'Unfortunately, this trading platform is not available for EU Deriv account. Please switch to a non-EU account to continue trading.'
+            ),
+            title: localize('Deriv Bot is unavailable for this account'),
+            link: localize('Switch to another account'),
+        };
     };
 
     getErrorForEuClients = is_logged_in => {
         return {
-            text: localize(' '),
+            text: ' ',
             title: is_logged_in
                 ? localize('Deriv Bot is not available for EU clients')
                 : localize('Deriv Bot is unavailable in the EU'),
@@ -184,7 +186,7 @@ export default class AppStore {
                     if (toggleAccountsDialog) {
                         showDigitalOptionsUnavailableError(
                             common.showError,
-                            this.error_for_non_eu_client,
+                            this.getErrorForNonEuClients(),
                             toggleAccountsDialog,
                             false,
                             false
@@ -221,7 +223,7 @@ export default class AppStore {
                     if (toggleAccountsDialog) {
                         showDigitalOptionsUnavailableError(
                             common.showError,
-                            this.error_for_non_eu_client,
+                            this.getErrorForNonEuClients(),
                             toggleAccountsDialog,
                             false,
                             false
@@ -297,7 +299,7 @@ export default class AppStore {
             if (toggleAccountsDialog) {
                 showDigitalOptionsUnavailableError(
                     common.showError,
-                    this.error_for_non_eu_client,
+                    this.getErrorForNonEuClients(),
                     toggleAccountsDialog,
                     false,
                     false
