@@ -174,11 +174,13 @@ export default class AppStore {
         this.disposeLandingCompanyChangeReaction = reaction(
             () => client.landing_company_shortcode,
             () => {
-                if (
-                    (client.is_eu &&
-                        window.location.pathname === routes.bot &&
-                        client.is_low_risk &&
-                        !client.is_eu_country) ||
+                if (client.is_eu_country || (client.is_eu && client.is_eu_country)) {
+                    showDigitalOptionsUnavailableError(
+                        common.showError,
+                        this.getErrorForEuClients(client.is_logged_in)
+                    );
+                } else if (
+                    (client.is_eu && !client.is_bot_allowed) ||
                     isEuResidenceWithOnlyVRTC(client.active_accounts) ||
                     client.is_options_blocked
                 ) {
@@ -192,14 +194,6 @@ export default class AppStore {
                             false
                         );
                     }
-                } else if (
-                    (client.is_eu_country && window.location.pathname === routes.bot) ||
-                    (!client.is_bot_allowed && window.location.pathname === routes.bot)
-                ) {
-                    showDigitalOptionsUnavailableError(
-                        common.showError,
-                        this.getErrorForEuClients(client.is_logged_in)
-                    );
                 }
             }
         );
@@ -211,11 +205,13 @@ export default class AppStore {
         this.disposeResidenceChangeReaction = reaction(
             () => client.account_settings.country_code,
             () => {
-                if (
-                    (client.is_eu &&
-                        window.location.pathname === routes.bot &&
-                        client.is_low_risk &&
-                        !client.is_eu_country) ||
+                if (client.is_eu_country || (client.is_eu && client.is_eu_country)) {
+                    showDigitalOptionsUnavailableError(
+                        common.showError,
+                        this.getErrorForEuClients(client.is_logged_in)
+                    );
+                } else if (
+                    (client.is_eu && !client.is_bot_allowed) ||
                     isEuResidenceWithOnlyVRTC(client.active_accounts) ||
                     client.is_options_blocked
                 ) {
@@ -229,14 +225,6 @@ export default class AppStore {
                             false
                         );
                     }
-                } else if (
-                    (client.is_eu_country && window.location.pathname === routes.bot) ||
-                    (!client.is_bot_allowed && window.location.pathname === routes.bot)
-                ) {
-                    showDigitalOptionsUnavailableError(
-                        common.showError,
-                        this.getErrorForEuClients(client.is_logged_in)
-                    );
                 }
             }
         );
@@ -290,8 +278,10 @@ export default class AppStore {
     };
 
     showDigitalOptionsMaltainvestError = (client, common, ui) => {
-        if (
-            (client.is_eu && window.location.pathname === routes.bot && client.is_low_risk && !client.is_eu_country) ||
+        if (client.is_eu_country || (client.is_eu && client.is_eu_country)) {
+            showDigitalOptionsUnavailableError(common.showError, this.getErrorForEuClients(client.is_logged_in));
+        } else if (
+            (client.is_eu && !client.is_bot_allowed) ||
             isEuResidenceWithOnlyVRTC(client.active_accounts) ||
             client.is_options_blocked
         ) {
@@ -305,11 +295,6 @@ export default class AppStore {
                     false
                 );
             }
-        } else if (
-            (client.is_eu_country && window.location.pathname === routes.bot) ||
-            (!client.is_bot_allowed && window.location.pathname === routes.bot)
-        ) {
-            showDigitalOptionsUnavailableError(common.showError, this.getErrorForEuClients(client.is_logged_in));
         } else if (common.has_error) {
             common.setError(false, null);
         }
