@@ -36,6 +36,33 @@ export default class AppStore {
         };
     };
 
+    errorHandleForEu = (should_show_error = false) => {
+        const { client, common, ui } = this.root_store.core;
+        if (
+            (client.is_eu_country && window.location.pathname === routes.bot) ||
+            (client.is_eu && !client.is_low_risk && window.location.pathname === routes.bot)
+        ) {
+            showDigitalOptionsUnavailableError(common.showError, this.getErrorForEuClients(client.is_logged_in));
+        } else if (
+            (client.is_eu && !client.is_bot_allowed && window.location.pathname === routes.bot) ||
+            isEuResidenceWithOnlyVRTC(client.active_accounts) ||
+            client.is_options_blocked
+        ) {
+            const toggleAccountsDialog = ui?.toggleAccountsDialog;
+            if (toggleAccountsDialog) {
+                showDigitalOptionsUnavailableError(
+                    common.showError,
+                    this.getErrorForNonEuClients(),
+                    toggleAccountsDialog,
+                    false,
+                    false
+                );
+            }
+        } else if (should_show_error && common.has_error) {
+            common.setError(false, null);
+        }
+    };
+
     onMount() {
         const { blockly_store, core, main_content } = this.root_store;
         const { client, common, ui } = core;
@@ -169,64 +196,20 @@ export default class AppStore {
     }
 
     registerLandingCompanyChangeReaction() {
-        const { client, common, ui } = this.root_store.core;
+        const { client } = this.root_store.core;
 
         this.disposeLandingCompanyChangeReaction = reaction(
             () => client.landing_company_shortcode,
-            () => {
-                if (client.is_eu_country || (client.is_eu && client.is_eu_country)) {
-                    showDigitalOptionsUnavailableError(
-                        common.showError,
-                        this.getErrorForEuClients(client.is_logged_in)
-                    );
-                } else if (
-                    (client.is_eu && !client.is_bot_allowed) ||
-                    isEuResidenceWithOnlyVRTC(client.active_accounts) ||
-                    client.is_options_blocked
-                ) {
-                    const toggleAccountsDialog = ui?.toggleAccountsDialog;
-                    if (toggleAccountsDialog) {
-                        showDigitalOptionsUnavailableError(
-                            common.showError,
-                            this.getErrorForNonEuClients(),
-                            toggleAccountsDialog,
-                            false,
-                            false
-                        );
-                    }
-                }
-            }
+            () => this.errorHandleForEu()
         );
     }
 
     registerResidenceChangeReaction() {
-        const { client, common, ui } = this.root_store.core;
+        const { client } = this.root_store.core;
 
         this.disposeResidenceChangeReaction = reaction(
             () => client.account_settings.country_code,
-            () => {
-                if (client.is_eu_country || (client.is_eu && client.is_eu_country)) {
-                    showDigitalOptionsUnavailableError(
-                        common.showError,
-                        this.getErrorForEuClients(client.is_logged_in)
-                    );
-                } else if (
-                    (client.is_eu && !client.is_bot_allowed) ||
-                    isEuResidenceWithOnlyVRTC(client.active_accounts) ||
-                    client.is_options_blocked
-                ) {
-                    const toggleAccountsDialog = ui?.toggleAccountsDialog;
-                    if (toggleAccountsDialog) {
-                        showDigitalOptionsUnavailableError(
-                            common.showError,
-                            this.getErrorForNonEuClients(),
-                            toggleAccountsDialog,
-                            false,
-                            false
-                        );
-                    }
-                }
-            }
+            () => this.errorHandleForEu()
         );
     }
 
@@ -277,26 +260,7 @@ export default class AppStore {
         }
     };
 
-    showDigitalOptionsMaltainvestError = (client, common, ui) => {
-        if (client.is_eu_country || (client.is_eu && client.is_eu_country)) {
-            showDigitalOptionsUnavailableError(common.showError, this.getErrorForEuClients(client.is_logged_in));
-        } else if (
-            (client.is_eu && !client.is_bot_allowed) ||
-            isEuResidenceWithOnlyVRTC(client.active_accounts) ||
-            client.is_options_blocked
-        ) {
-            const toggleAccountsDialog = ui?.toggleAccountsDialog;
-            if (toggleAccountsDialog) {
-                showDigitalOptionsUnavailableError(
-                    common.showError,
-                    this.getErrorForNonEuClients(),
-                    toggleAccountsDialog,
-                    false,
-                    false
-                );
-            }
-        } else if (common.has_error) {
-            common.setError(false, null);
-        }
+    showDigitalOptionsMaltainvestError = () => {
+        this.errorHandleForEu();
     };
 }
