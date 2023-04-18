@@ -36,7 +36,7 @@ export default class AppStore {
         };
     };
 
-    errorHandleForEu = (should_show_error = false) => {
+    handleErrorForEu = (show_default_error = false) => {
         const { client, common, ui } = this.root_store.core;
         if (
             (client.is_eu_country && window.location.pathname === routes.bot) ||
@@ -58,7 +58,7 @@ export default class AppStore {
                     false
                 );
             }
-        } else if (should_show_error && common.has_error) {
+        } else if (show_default_error && common.has_error) {
             common.setError(false, null);
         }
     };
@@ -200,7 +200,7 @@ export default class AppStore {
 
         this.disposeLandingCompanyChangeReaction = reaction(
             () => client.landing_company_shortcode,
-            () => this.errorHandleForEu()
+            () => this.handleErrorForEu()
         );
     }
 
@@ -209,7 +209,7 @@ export default class AppStore {
 
         this.disposeResidenceChangeReaction = reaction(
             () => client.account_settings.country_code,
-            () => this.errorHandleForEu()
+            () => this.handleErrorForEu()
         );
     }
 
@@ -261,6 +261,6 @@ export default class AppStore {
     };
 
     showDigitalOptionsMaltainvestError = () => {
-        this.errorHandleForEu();
+        this.handleErrorForEu(true);
     };
 }
