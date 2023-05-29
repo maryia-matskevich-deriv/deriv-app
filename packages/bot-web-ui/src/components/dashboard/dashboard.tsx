@@ -8,7 +8,6 @@ import { DBOT_TABS, TAB_IDS } from 'Constants/bot-contents';
 import React from 'react';
 import { connect } from 'Stores/connect';
 import RootStore from 'Stores/index';
-import { getImageLocation } from '../../public-path';
 import RunPanel from '../run-panel';
 import BotNotification from './bot-notification';
 import DashboardComponent from './dashboard-component';
@@ -43,6 +42,7 @@ type TDashboard = {
     is_dialog_open: boolean;
     is_drawer_open: boolean;
     is_tour_dialog_visible: boolean;
+    is_strategy_modal_open: boolean;
     onCancelButtonClick: () => void;
     onCloseDialog: () => void;
     onEntered: () => void;
@@ -67,6 +67,7 @@ const Dashboard = ({
     has_started_bot_builder_tour,
     is_dialog_open,
     is_tour_dialog_visible,
+    is_strategy_modal_open,
     onCancelButtonClick,
     onCloseDialog,
     onEntered,
@@ -80,7 +81,7 @@ const Dashboard = ({
     setTourDialogVisibility,
     setHasTourEnded,
 }: TDashboard) => {
-    const { BOT_BUILDER, CHART } = DBOT_TABS;
+    const { DASHBOARD, BOT_BUILDER, CHART } = DBOT_TABS;
     const is_tour_complete = React.useRef(true);
     let bot_tour_token: string | number = '';
     let onboard_tour_token: string | number = '';
@@ -105,7 +106,7 @@ const Dashboard = ({
     };
 
     React.useEffect(() => {
-        if (active_tab === 1) {
+        if (active_tab === BOT_BUILDER) {
             if (is_drawer_open) {
                 initTrashCan(400);
             } else {
@@ -115,15 +116,15 @@ const Dashboard = ({
                 window.dispatchEvent(new Event('resize')); // make the trash can work again after resize
             }, 500);
         }
-        if (active_tab === 0 && has_file_loaded) {
+        if (active_tab === DASHBOARD && has_file_loaded) {
             onEntered();
         }
-        if (active_tab === 0) {
+        if (active_tab === DASHBOARD) {
             setTourType('onboard_tour');
             onboard_tour_token = getTourSettings('token');
             setOnBoardingTokenCheck(onboard_tour_token);
         }
-        if (active_tab === 1 && !has_started_onboarding_tour) {
+        if (active_tab === BOT_BUILDER && !has_started_onboarding_tour) {
             setTourType('bot_builder');
             bot_tour_token = getTourSettings('token');
             setBotBuilderTokenCheck(bot_tour_token);
@@ -160,45 +161,30 @@ const Dashboard = ({
 
     React.useEffect(() => {
         const dbot_settings = JSON.parse(localStorage.getItem('dbot_settings') as string);
-        const has_onboard_token_set = active_tab === 0 && !dbot_settings?.onboard_tour_token;
-        const has_bot_builder_token_set = active_tab === 1 && !dbot_settings?.bot_builder_token;
+        const has_onboard_token_set = active_tab === DASHBOARD && !dbot_settings?.onboard_tour_token;
+        const has_bot_builder_token_set = active_tab === BOT_BUILDER && !dbot_settings?.bot_builder_token;
+        const show_tour_dialog_desktop = (active_tab === DASHBOARD && !is_mobile) || active_tab === BOT_BUILDER;
+        const show_tour_dialog_mobile = active_tab !== DASHBOARD && is_mobile;
         if (has_bot_builder_token_set || has_onboard_token_set) {
             if (is_mobile && has_started_onboarding_tour) {
                 setTourActive(true);
                 setOnBoardTourRunState(true);
             } else {
                 setHasTourEnded(false);
-                setTourDialogVisibility(true);
+                if (show_tour_dialog_mobile || show_tour_dialog_desktop) {
+                    setTourDialogVisibility(true);
+                } else {
+                    setTourActive(true);
+                    setOnBoardTourRunState(true);
+                }
             }
         }
-        if (has_started_bot_builder_tour && active_tab !== 1 && is_mobile) {
+        if (has_started_bot_builder_tour && active_tab !== BOT_BUILDER && is_mobile) {
             setTourActive(false);
             setBotBuilderTourState(false);
             setTourSettings(new Date().getTime(), `${tour_type.key}_token`);
         }
     }, [active_tab]);
-
-    React.useEffect(() => {
-        const images = [
-            getImageLocation('ic-new-user-step-two.png'),
-            getImageLocation('ic-new-user-step-three.png'),
-            getImageLocation('ic-new-user-step-four.png'),
-            getImageLocation('ic-new-user-step-five.png'),
-            getImageLocation('ic-new-user-step-six.png'),
-            getImageLocation('ic-new-user-step-seven.png'),
-        ];
-
-        images.forEach(img => {
-            if (!document.getElementById(img)) {
-                const link = document.createElement('link');
-                link.setAttribute('rel', 'preload');
-                link.setAttribute('as', 'image');
-                link.setAttribute('href', img);
-                link.setAttribute('id', img);
-                document.getElementsByTagName('head')[0].appendChild(link);
-            }
-        });
-    }, [has_tour_started]);
 
     const handleTabChange = React.useCallback(
         (tab_index: number) => {
@@ -221,12 +207,12 @@ const Dashboard = ({
             <div className='dashboard__main'>
                 <div
                     className={classNames('dashboard__container', {
-                        'dashboard__container--active': has_tour_started && active_tab === 0 && is_mobile,
+                        'dashboard__container--active': has_tour_started && active_tab === DASHBOARD && is_mobile,
                     })}
                 >
                     <TourTriggrerDialog />
                     {has_tour_started &&
-                        active_tab === 0 &&
+                        active_tab === DASHBOARD &&
                         (is_mobile ? (
                             <TourSlider />
                         ) : (
@@ -240,7 +226,7 @@ const Dashboard = ({
                         top
                     >
                         <div icon='IcDashboardComponentTab' label={localize('Dashboard')} id='id-dbot-dashboard'>
-                            <DashboardComponent />
+                            <DashboardComponent handleTabChange={handleTabChange} />
                         </div>
                         <div icon='IcBotBuilderTabIcon' label={localize('Bot Builder')} id='id-bot-builder' />
                         <div icon='IcChartsTabDbot' label={localize('Charts')} id='id-charts'>
@@ -261,7 +247,7 @@ const Dashboard = ({
                         !has_started_bot_builder_tour && <RunPanel />}
                 </div>
             </DesktopWrapper>
-            <MobileWrapper>{active_tab !== 2 && <RunPanel />}</MobileWrapper>
+            <MobileWrapper>{!is_strategy_modal_open && <RunPanel />}</MobileWrapper>
             <Dialog
                 cancel_button_text={dialog_options.cancel_button_text || localize('Cancel')}
                 className={'dc-dialog__wrapper--fixed'}
@@ -282,7 +268,7 @@ const Dashboard = ({
     );
 };
 
-export default connect(({ dashboard, run_panel, load_modal }: RootStore) => ({
+export default connect(({ dashboard, run_panel, load_modal, quick_strategy }: RootStore) => ({
     active_tab: dashboard.active_tab,
     has_file_loaded: dashboard.has_file_loaded,
     has_tour_started: dashboard.has_tour_started,
@@ -305,4 +291,5 @@ export default connect(({ dashboard, run_panel, load_modal }: RootStore) => ({
     setBotBuilderTokenCheck: dashboard.setBotBuilderTokenCheck,
     setOnBoardingTokenCheck: dashboard.setOnBoardingTokenCheck,
     has_tour_ended: dashboard.has_tour_ended,
+    is_strategy_modal_open: quick_strategy.is_strategy_modal_open,
 }))(Dashboard);

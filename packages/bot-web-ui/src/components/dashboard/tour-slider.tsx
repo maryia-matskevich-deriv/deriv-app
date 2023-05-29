@@ -18,7 +18,7 @@ type TTourSlider = {
     onCloseTour: () => void;
     onTourEnd: (step: number, has_started_onboarding_tour: boolean) => void;
     setTourActiveStep: (param: number) => void;
-    toggleLoadModal: () => void;
+    toggleTourLoadModal: (toggle: boolean) => void;
 };
 
 type TAccordion = {
@@ -58,7 +58,9 @@ const Accordion = ({ content_data, expanded = false, ...props }: TAccordion) => 
                         'dbot-accordion__content--open': is_open,
                     })}
                 >
-                    {localize(content)}
+                    <Text as='span' size='xxs' line_height='s' color='colored-background'>
+                        {localize(content)}
+                    </Text>
                 </div>
             </div>
         </div>
@@ -71,7 +73,7 @@ const TourSlider = ({
     has_started_onboarding_tour,
     has_started_bot_builder_tour,
     setTourActiveStep,
-    toggleLoadModal,
+    toggleTourLoadModal,
 }: TTourSlider) => {
     const [step, setStep] = React.useState<number>(1);
     const [slider_content, setContent] = React.useState<string | string[]>('');
@@ -97,8 +99,8 @@ const TourSlider = ({
             el_ref?.classList.remove('dbot-tour-blink');
         }
         if (has_started_bot_builder_tour && step === 2) {
-            toggleLoadModal();
-        }
+            toggleTourLoadModal(true);
+        } else toggleTourLoadModal(false);
     }, [step]);
 
     const onChange = React.useCallback(
@@ -137,7 +139,7 @@ const TourSlider = ({
                             weight='less-prominent'
                             line_height='s'
                             size='xxs'
-                        >{`${step_key}/7`}</Text>
+                        >{`${step_key}/6`}</Text>
                         <Text
                             color='prominent'
                             weight='--text-less-prominent'
@@ -190,13 +192,15 @@ const TourSlider = ({
                 {!has_started_onboarding_tour && content_data && <Accordion content_data={content_data} expanded />}
                 <div className='dbot-slider__status'>
                     <div className='dbot-slider__progress-bar'>
-                        <ProgressBarOnboarding
-                            step={step}
-                            amount_of_steps={Object.keys(
-                                !has_started_onboarding_tour ? BOT_BUILDER_MOBILE : DBOT_ONBOARDING_MOBILE
-                            )}
-                            setStep={setStep}
-                        />
+                        {(!has_started_onboarding_tour || (has_started_onboarding_tour && step !== 1)) && (
+                            <ProgressBarOnboarding
+                                step={step}
+                                amount_of_steps={Object.keys(
+                                    !has_started_onboarding_tour ? BOT_BUILDER_MOBILE : DBOT_ONBOARDING_MOBILE
+                                )}
+                                setStep={setStep}
+                            />
+                        )}
                     </div>
                     <div className='dbot-slider__button-group'>
                         {has_started_onboarding_tour && step === 1 && (
@@ -232,5 +236,5 @@ export default connect(({ dashboard, load_modal }: RootStore) => ({
     onTourEnd: dashboard.onTourEnd,
     setActiveTab: dashboard.setActiveTab,
     setTourActiveStep: dashboard.setTourActiveStep,
-    toggleLoadModal: load_modal.toggleLoadModal,
+    toggleTourLoadModal: load_modal.toggleTourLoadModal,
 }))(TourSlider);
