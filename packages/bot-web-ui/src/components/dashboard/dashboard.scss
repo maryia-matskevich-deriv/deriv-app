@@ -308,7 +308,7 @@
         margin-bottom: 2.4rem;
 
         img {
-            width: 96%;
+            width: 97%;
         }
     }
 
@@ -421,6 +421,9 @@
 
     &--tour-position {
         top: 0;
+        .progress-bar-circle:first-child {
+            display: none;
+        }
     }
 
     &--active {
@@ -450,11 +453,16 @@
     }
 
     &__image {
-        background: $color-grey-2;
+        background: var(--general-section-1);
         text-align: center;
         padding: 0.8rem;
         width: 100%;
         margin-bottom: 0.8rem;
+        height: 50%;
+    }
+
+    img {
+        height: 100%;
     }
 
     &__progress-bar {

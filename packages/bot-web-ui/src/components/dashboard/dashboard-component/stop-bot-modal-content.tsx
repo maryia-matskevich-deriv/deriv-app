@@ -20,11 +20,14 @@ const StopBotModalContent = ({
     is_stop_bot_dialog_open,
     closeMultiplierContract,
     onOkButtonClick,
+    toggleStopBotDialog,
 }: TStopBotModalContent) => {
     const confirm_button_text = is_running && is_multiplier ? localize('Keep my contract') : localize('Stop my bot');
     const cancel_button_text = is_running && is_multiplier ? localize('Close my contract') : localize('Back');
     const title_text =
         is_running && is_multiplier ? localize('Keep your current contract?') : localize('Stop your current bot?');
+    const toggle_dialog_or_stop = is_running && is_multiplier ? closeMultiplierContract : toggleStopBotDialog;
+
     return (
         <React.Fragment>
             <Dialog
@@ -34,7 +37,7 @@ const StopBotModalContent = ({
                 confirm_button_text={confirm_button_text}
                 onConfirm={onOkButtonClick}
                 cancel_button_text={cancel_button_text}
-                onCancel={closeMultiplierContract}
+                onCancel={toggle_dialog_or_stop}
                 is_mobile_full_width={false}
                 className={'toolbar__dialog'}
                 has_close_icon
@@ -45,12 +48,7 @@ const StopBotModalContent = ({
                             {localize(
                                 'Close your contract now or keep it running. If you decide to keep it running, you can check and close it later on the '
                             )}
-                            <Text
-                                as='span'
-                                line_height='s'
-                                size='xs'
-                                styles={{ color: 'var(--button-primary-default)' }}
-                            >
+                            <Text as='span' line_height='s' size='xs'>
                                 <strong>{localize('Reports')}</strong>
                             </Text>
                             {localize(' page.')}
@@ -68,12 +66,7 @@ const StopBotModalContent = ({
                         </Text>
                         <Text as='p' line_height='s' size='xs'>
                             {localize(' Any open contracts can be viewed on the ')}
-                            <Text
-                                as='span'
-                                line_height='s'
-                                size='xs'
-                                styles={{ color: 'var(--button-primary-default)' }}
-                            >
+                            <Text as='span' line_height='s' size='xs'>
                                 <strong>{localize('Reports')}</strong>
                             </Text>
                             {localize(' page.')}
