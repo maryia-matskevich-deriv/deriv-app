@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { Text } from '@deriv/components';
-import { Notifications as Announcement } from '@deriv-com/ui';
+import React, { ComponentProps, forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useRef, useState } from 'react';
+import { Modal, Text, useDevice } from '@deriv/components';
+// import { Notifications as Announcement } from '@deriv-com/ui';
 import { StandaloneBullhornRegularIcon } from '@deriv/quill-icons';
 import { useHistory } from 'react-router-dom';
 import clsx from 'clsx';
@@ -10,6 +10,244 @@ import { BOT_ANNOUNCEMENTS_LIST, TAnnouncement, TNotifications } from './config'
 import './announcements.scss';
 import { MessageAnnounce, TitleAnnounce } from './announcement-components';
 import { getButtonAction } from './utils/accumulator-helper-functions';
+import { useOnClickOutside } from "usehooks-ts";
+
+
+type ContextMenuProps = ComponentProps<"div"> & {
+    isOpen: boolean;
+};
+
+export const ContextMenu = forwardRef<
+    HTMLDivElement,
+    PropsWithChildren<ContextMenuProps>
+>(
+    (
+        {
+            children,
+            className,
+            isOpen,
+            ...rest
+        }: PropsWithChildren<ContextMenuProps>,
+        ref,
+    ) => {
+        const [hide, setHide] = useState(true);
+        const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+        useEffect(() => {
+            if (isOpen) setHide(false);
+            else {
+                timerRef.current = setTimeout(() => {
+                    setHide(!isOpen);
+                }, 400);
+            }
+            return () => {
+                timerRef.current && clearTimeout(timerRef.current);
+            };
+        }, [isOpen]);
+
+        if (hide) return null;
+
+        return (
+            <div
+                ref={ref}
+                className={clsx(
+                    "deriv-context-menu",
+                    !isOpen && "deriv-fadeout",
+                    className,
+                )}
+                onClick={(e) => e.stopPropagation()}
+                {...rest}
+            >
+                {children}
+            </div>
+        );
+    },
+);
+
+export type TNotificationObject = {
+    icon: ReactNode;
+    title: string;
+    message: string;
+    buttonAction?: () => void;
+    actionText?: string;
+};
+export type TNotificationsProps = ComponentProps<"div"> & {
+    notifications: TNotificationObject[];
+    clearNotificationsCallback: () => void;
+    setIsOpen: (state: boolean) => void;
+    isOpen: boolean;
+    componentConfig: {
+        clearButtonText: string;
+        modalTitle: string;
+        noNotificationsTitle: string;
+        noNotificationsMessage: string;
+    };
+};
+
+export const Notification = ({
+    icon,
+    title,
+    message,
+    buttonAction,
+    actionText,
+}: TNotificationObject) => {
+    return (
+        <div className="notification">
+            <div className="notification__container">
+                <div className="notification__icon">{icon}</div>
+                <div className="notification__text">
+                    <Text
+                        as="h3" className="notification__title">{title}</Text>
+                    <div className="notification__message">
+                        <Text as="p">{message}</Text>
+                    </div>
+                </div>
+            </div>
+            {buttonAction && actionText && (
+                <div className="notification__button-container">
+                    <button className="notification__button" onClick={buttonAction}>
+                        {actionText}
+                    </button>
+                </div>
+            )}
+        </div>
+    );
+};
+
+export const Announcement = ({
+    notifications,
+    clearNotificationsCallback = () => { },
+    isOpen,
+    setIsOpen,
+    componentConfig,
+    className,
+    ...rest
+}: Omit<TNotificationsProps, "style">) => {
+    const { is_mobile } = useDevice();
+    const notificationsRef = useRef(null);
+
+    useOnClickOutside(notificationsRef, (e) => {
+        console.log('useOnClickOutside', e.target);
+        
+        e.stopPropagation();
+        e.preventDefault()
+        setIsOpen(false);
+    });
+
+    return (
+        <Fragment>
+            {is_mobile && (
+                <Modal
+                    className={clsx("notifications", className)}
+                    isOpen={isOpen}
+                    onRequestClose={() => {
+                        setIsOpen(false);
+                    }}
+                    {...rest}
+                >
+                    <Modal.Header
+                        onRequestClose={() => {
+                            setIsOpen(false);
+                        }}
+                    >
+                        <Text
+                            as="div"
+                            weight="bold"
+                            className="deriv-modal__header-title"
+                        >
+                            {componentConfig.modalTitle}
+                        </Text>
+                    </Modal.Header>
+                    {notifications.length === 0 && (
+                        <div className="notifications__empty">
+                            {/* <img src={Icon} /> */}
+                            <Text
+                                as="p"
+                                align="center"
+                                className="notifications__empty-text"
+                            >
+                                {componentConfig.noNotificationsTitle}
+                            </Text>
+                            <Text as="span" align="center">
+                                {componentConfig.noNotificationsMessage}
+                            </Text>
+                        </div>
+                    )}
+                    {notifications.map((notification) => (
+                        <Notification
+                            key={notification.title}
+                            {...notification}
+                        />
+                    ))}
+                    <Modal.Footer className="notifications__footer">
+                        <button
+                            className={clsx("notifications__footer__clear-button", {
+                                "notifications__footer__clear-button--disabled": notifications.length === 0
+                            })}
+                            onClick={() => {
+                                if (notifications.length > 0) {
+                                    setIsOpen(false);
+                                    clearNotificationsCallback();
+                                }
+                            }}
+                        >
+                            {componentConfig.clearButtonText}
+                        </button>
+                    </Modal.Footer>
+                </Modal>
+            )}
+            {!is_mobile && (
+                <ContextMenu
+                    ref={notificationsRef}
+                    isOpen={isOpen}
+                    className={clsx("notifications", className)}
+                    {...rest}
+                >
+                    <Text as="span" className="notifications__header-desktop">
+                        {componentConfig.modalTitle}
+                    </Text>
+                    {notifications.length === 0 && (
+                        <div className="notifications__empty">
+                            {/* <img src={Icon} /> */}
+                            <Text
+                                as="p"
+                                align="center"
+                                className="notifications__empty-text"
+                            >
+                                {componentConfig.noNotificationsTitle}
+                            </Text>
+                            <Text as="span" align="center">
+                                {componentConfig.noNotificationsMessage}
+                            </Text>
+                        </div>
+                    )}
+                    {notifications.map((notification) => (
+                        <Notification
+                            key={notification.title}
+                            {...notification}
+                        />
+                    ))}
+                    <div className="notifications__footer">
+                        <div className="notifications__footer-box">
+                            <button
+                                className={clsx("notifications__footer__clear-button", {
+                                    "notifications__footer__clear-button--disabled": notifications.length === 0
+                                })}
+                                onClick={() => {
+                                    if (notifications.length > 0) {
+                                        setIsOpen(false);
+                                        clearNotificationsCallback();
+                                    }
+                                }}
+                            >
+                                {componentConfig.clearButtonText}
+                            </button>
+                        </div>
+                    </div>
+                </ContextMenu>
+            )}
+        </Fragment>
+    );
+};
 
 type TAnnouncements = {
     is_mobile?: boolean;
@@ -117,11 +355,17 @@ const Announcements = ({ is_mobile, handleTabChange }: TAnnouncements) => {
         setStoredNotifications(temp_notifications);
     };
 
+    const onClick = (e) => {
+        console.log('onClick', e.target);
+        
+        setIsOpenAnnounceList(prevState => !prevState);
+    } 
+
     return (
         <div className='announcements'>
             <button
                 className='announcements__button'
-                onClick={() => setIsOpenAnnounceList(prevState => !prevState)}
+                onClick={onClick}
                 data-testid='btn-announcements'
             >
                 <StandaloneBullhornRegularIcon fill='var(--icon-black-plus)' iconSize='sm' />
@@ -151,9 +395,12 @@ const Announcements = ({ is_mobile, handleTabChange }: TAnnouncements) => {
                     }}
                     isOpen={is_open_announce_list}
                     // eslint-disable-next-line no-empty-function
-                    setIsOpen={() => {
-                        /* Need to be fixed from the UI library*/
-                    }}
+                    setIsOpen={
+                        setIsOpenAnnounceList
+                        // () => {
+                        // /* Need to be fixed from the UI library*/
+                        // }
+                    }
                     notifications={notifications}
                 />
             </div>
