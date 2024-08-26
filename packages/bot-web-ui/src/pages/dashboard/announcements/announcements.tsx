@@ -126,11 +126,12 @@ export const Announcement = ({
     const notificationsRef = useRef(null);
 
     useOnClickOutside(notificationsRef, (e) => {
-        console.log('useOnClickOutside', e.target);
+        console.log('useOnClickOutside',e, e.target.className.split(' ').includes('announcements__label'));//pass actionButtonClassName
         
         e.stopPropagation();
-        e.preventDefault()
-        setIsOpen(false);
+        if (e.target.className !== 'dc-text announcements__label') {
+            setIsOpen(false);
+        }
     });
 
     return (
@@ -357,7 +358,7 @@ const Announcements = ({ is_mobile, handleTabChange }: TAnnouncements) => {
 
     const onClick = (e) => {
         console.log('onClick', e.target);
-        
+        // e.stopPropagation();
         setIsOpenAnnounceList(prevState => !prevState);
     } 
 
